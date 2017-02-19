@@ -2,8 +2,8 @@ package goplot
 
 import (
 	"bufio"
-	"os"
 	"log"
+	"os"
 )
 
 func inputScanner(args []string) *bufio.Scanner {
@@ -17,4 +17,3 @@ func inputScanner(args []string) *bufio.Scanner {
 	}
 	return bufio.NewScanner(input)
 }
-

@@ -1,11 +1,11 @@
 package goplot
 
 import (
-	"fmt"
-	"os"
 	"bufio"
-	"strconv"
+	"fmt"
 	"math"
+	"os"
+	"strconv"
 )
 
 // extend histogram flags from bar's flags
@@ -80,7 +80,7 @@ func groupValuesToBins(values []float64, nBin int, left float64, right float64) 
 
 	// label the bin by the upper/right bound
 	for bin := 0; bin < nBin; bin++ {
-		left_bound := left + float64(bin) * binSize
+		left_bound := left + float64(bin)*binSize
 		right_bound := left_bound + binSize
 		bins[bin].label = fmt.Sprintf("%.2f", right_bound)
 	}
@@ -90,9 +90,9 @@ func groupValuesToBins(values []float64, nBin int, left float64, right float64) 
 		case val < left, val > right:
 			continue
 		case val == right:
-			bins[nBin - 1].value++
+			bins[nBin-1].value++
 		default:
-			bins[int((val - left) / binSize)].value++
+			bins[int((val-left)/binSize)].value++
 		}
 	}
 	return bins

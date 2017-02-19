@@ -31,7 +31,7 @@ func main() {
 	}
 }
 
-func Usage()  {
+func Usage() {
 	fmt.Fprintln(os.Stderr, "goplot - terminal based stream plotting")
 	fmt.Fprintln(os.Stderr, "Usage: \n\t goplot (bar|hist) [options]")
 }

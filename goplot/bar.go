@@ -1,12 +1,12 @@
 package goplot
 
 import (
+	"bufio"
+	"flag"
 	"fmt"
 	"math"
 	"strconv"
 	"strings"
-	"flag"
-	"bufio"
 )
 
 const block = "▇"
@@ -82,6 +82,6 @@ func drawBars(values []LabeledValue) {
 			// use a small line for bar with 0 width
 			rect = tinyBlock
 		}
-		fmt.Printf("%" + labelWidth + "s: %s  %g\n", bar.label, rect, bar.value)
+		fmt.Printf("%"+labelWidth+"s: %s  %g\n", bar.label, rect, bar.value)
 	}
 }
