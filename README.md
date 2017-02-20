@@ -2,6 +2,12 @@
 
 ![Sample plots](https://cloud.githubusercontent.com/assets/234997/23109988/8851f8c6-f6d2-11e6-9e3a-2e13fefd78d5.png)
 
+## Install:
+
+```
+$ go get github.com/lebinh/goplot
+```
+
 ## Samples:
 
 ```
