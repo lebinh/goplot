@@ -13,6 +13,11 @@ type Bound struct {
 	right float64
 }
 
+type Bin struct {
+	bound Bound
+	count int
+}
+
 // extend histogram flags from bar's flags
 var histFlags = barFlags
 var nBin int
@@ -49,7 +54,7 @@ func Histogram(args []string) error {
 	}
 
 	bins := groupValuesToBins(values, nBin, Bound{leftBound, rightBound})
-	drawBars(bins)
+	drawBins(bins)
 	return nil
 }
 
@@ -84,26 +89,37 @@ func getBounds(values []float64) Bound {
 	return Bound{min, max}
 }
 
-func groupValuesToBins(values []float64, nBin int, bound Bound) []LabeledValue {
+func groupValuesToBins(values []float64, nBin int, bound Bound) []Bin {
 	binSize := (bound.right - bound.left) / float64(nBin)
-	bins := make([]LabeledValue, nBin)
+	bins := make([]Bin, nBin)
 
 	// label the bin by the upper/right bound
 	for bin := 0; bin < nBin; bin++ {
-		right_bound := bound.left + float64(bin+1)*binSize
-		bins[bin].label = fmt.Sprintf("%.2f", right_bound)
+		leftBound := bound.left + float64(bin)*binSize
+		rightBound := leftBound + binSize
+		bins[bin].bound = Bound{leftBound, rightBound}
 	}
-	bins[0].label = fmt.Sprintf("%.2f -> %s", bound.left, bins[0].label)
 
 	for _, val := range values {
 		switch {
 		case val < bound.left, val > bound.right:
 			continue
 		case val == bound.right:
-			bins[nBin-1].value++
+			bins[nBin-1].count++
 		default:
-			bins[int((val-bound.left)/binSize)].value++
+			bins[int((val-bound.left)/binSize)].count++
 		}
 	}
 	return bins
+}
+
+func drawBins(bins []Bin) {
+	bars := make([]LabeledValue, len(bins))
+	for i, bin := range bins {
+		bars[i].label = fmt.Sprintf("%.2f", bin.bound.right)
+	}
+	if len(bins) > 1 {
+		bars[0].label = fmt.Sprintf("%.2f -> %.2f", bins[0].bound.left, bins[0].bound.right)
+	}
+	drawBars(bars)
 }

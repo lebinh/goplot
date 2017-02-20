@@ -1,8 +1,8 @@
 package plot
 
 import (
-	"testing"
 	"reflect"
+	"testing"
 )
 
 type List []float64
@@ -28,15 +28,14 @@ func TestGroupValuesToBins(t *testing.T) {
 	tests := []struct {
 		input List
 		nBin  int
-		want  []LabeledValue
+		want  []Bin
 	}{
-		{List{}, 0, []LabeledValue{}},
-		{List{}, 1, []LabeledValue{{"0.00", 0}}},
-		{List{}, 2, []LabeledValue{{"0.00", 0}, {"0.00", 0}}},
-		{List{1}, 1, []LabeledValue{{"1.00", 1}}},
-		{List{1, 2}, 1, []LabeledValue{{"2.00", 2}}},
-		{List{1, 2}, 2, []LabeledValue{{"1.50", 1}, {"2.00", 1}}},
-		{List{0, 1, 1, 2, 3}, 3, []LabeledValue{{"1.00", 1}, {"2.00", 2}, {"3.00", 2}}},
+		{List{}, 0, []Bin{}},
+		{List{}, 1, []Bin{{Bound{0, 0}, 0}}},
+		{List{1}, 1, []Bin{{Bound{1, 1}, 1}}},
+		{List{1, 2}, 1, []Bin{{Bound{1, 2}, 2}}},
+		{List{1, 2}, 2, []Bin{{Bound{1, 1.5}, 1}, {Bound{1.5, 2}, 1}}},
+		{List{0, 1, 1, 2, 3}, 3, []Bin{{Bound{0, 1}, 1}, {Bound{1, 2}, 2}, {Bound{2, 3}, 2}}},
 	}
 	for _, test := range tests {
 		bounds := getBounds(test.input)
