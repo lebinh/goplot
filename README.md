@@ -1,6 +1,6 @@
 # `goplot` - terminal based stream plotting
 
-![Sample plots](https://cloud.githubusercontent.com/assets/234997/23109988/8851f8c6-f6d2-11e6-9e3a-2e13fefd78d5.png)
+![Sample plots](https://cloud.githubusercontent.com/assets/234997/23121604/ebbe9cb4-f715-11e6-8541-6881d19aadd1.png)
 
 ## Install:
 
