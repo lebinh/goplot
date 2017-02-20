@@ -3,7 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/lebinh/goplot/goplot"
+	"github.com/lebinh/goplot/plot"
 	"os"
 )
 
@@ -19,9 +19,9 @@ func main() {
 	var err error
 	switch flag.Arg(0) {
 	case "bar":
-		err = goplot.BarPlot(plotArgs)
+		err = plot.Bar(plotArgs)
 	case "hist":
-		err = goplot.HistogramPlot(plotArgs)
+		err = plot.Histogram(plotArgs)
 	default:
 		fmt.Fprintf(os.Stderr, "unknown command: %s\n", flag.Arg(0))
 	}
@@ -32,6 +32,6 @@ func main() {
 }
 
 func Usage() {
-	fmt.Fprintln(os.Stderr, "goplot - terminal based stream plotting")
-	fmt.Fprintln(os.Stderr, "Usage: \n\t goplot (bar|hist) [options]")
+	fmt.Fprintln(os.Stderr, "plot - terminal based stream plotting")
+	fmt.Fprintln(os.Stderr, "Usage: \n\t plot (bar|hist) [options]")
 }

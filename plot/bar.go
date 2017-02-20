@@ -1,4 +1,4 @@
-package goplot
+package plot
 
 import (
 	"bufio"
@@ -21,7 +21,7 @@ var barFlags = flag.NewFlagSet("bar", flag.ExitOnError)
 var separator = barFlags.String("sep", " ", "string used to separate values")
 var maxWidth = barFlags.Int("width", 60, "maximum width of the plotted bar")
 
-func BarPlot(args []string) error {
+func Bar(args []string) error {
 	barFlags.Parse(args)
 
 	scanner := inputScanner(barFlags.Args())
@@ -39,17 +39,17 @@ func readLabeledValues(scanner *bufio.Scanner) ([]LabeledValue, error) {
 		text := scanner.Text()
 		parts := strings.Split(text, *separator)
 		if len(parts) != 2 {
-			return values, fmt.Errorf("bar goplot: input is not in \"label%svalue\" format: %s", *separator, text)
+			return values, fmt.Errorf("bar plot: input is not in \"label%svalue\" format: %s", *separator, text)
 		}
 
 		label := parts[0]
 		value, err := strconv.ParseFloat(parts[1], 64)
 		if err != nil {
-			return values, fmt.Errorf("bar goplot: input value is not a number: %v", err)
+			return values, fmt.Errorf("bar plot: input value is not a number: %v", err)
 		}
 
 		if value < 0 {
-			return values, fmt.Errorf("bar goplot: goplot with negative number is not supported yet: %v", value)
+			return values, fmt.Errorf("bar plot: plot with negative number is not supported yet: %v", value)
 		}
 		values = append(values, LabeledValue{label, value})
 	}

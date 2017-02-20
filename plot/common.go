@@ -1,4 +1,4 @@
-package goplot
+package plot
 
 import (
 	"bufio"
@@ -12,7 +12,7 @@ func inputScanner(args []string) *bufio.Scanner {
 	if len(args) > 0 {
 		input, err = os.Open(args[0])
 		if err != nil {
-			log.Fatalf("goplot: %v\n", err)
+			log.Fatalf("plot: %v\n", err)
 		}
 	}
 	return bufio.NewScanner(input)

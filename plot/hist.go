@@ -1,4 +1,4 @@
-package goplot
+package plot
 
 import (
 	"bufio"
@@ -8,13 +8,18 @@ import (
 	"strconv"
 )
 
+type Bound struct {
+	left  float64
+	right float64
+}
+
 // extend histogram flags from bar's flags
 var histFlags = barFlags
 var nBin int
 var leftBound float64
 var rightBound float64
 
-func HistogramPlot(args []string) error {
+func Histogram(args []string) error {
 	// create histogram specific flag here because we reused bar plot flags for hist
 	histFlags.IntVar(&nBin, "bin", 10, "number of bins in histogram")
 	histFlags.Float64Var(&leftBound, "left", math.NaN(), "left bound of the histogram, default is min value")
@@ -34,16 +39,16 @@ func HistogramPlot(args []string) error {
 
 	// left, right bounds is min, max value by default, which is indicated by NaN
 	if math.IsNaN(leftBound) || math.IsNaN(rightBound) {
-		min, max := getBounds(values)
+		bound := getBounds(values)
 		if math.IsNaN(leftBound) {
-			leftBound = min
+			leftBound = bound.left
 		}
 		if math.IsNaN(rightBound) {
-			rightBound = max
+			rightBound = bound.right
 		}
 	}
-	bins := groupValuesToBins(values, nBin, leftBound, rightBound)
-	fmt.Printf("%d bins histogram of %d values from %g to %g\n", nBin, len(values), leftBound, rightBound)
+
+	bins := groupValuesToBins(values, nBin, Bound{leftBound, rightBound})
 	drawBars(bins)
 	return nil
 }
@@ -60,10 +65,15 @@ func readValues(scanner *bufio.Scanner) ([]float64, error) {
 	return values, nil
 }
 
-func getBounds(values []float64) (min float64, max float64) {
-	min = math.MaxFloat64
-	max = -min
-	for _, val := range values {
+func getBounds(values []float64) Bound {
+	// let's just return [0, 0] as default bound for an empty slice
+	if len(values) == 0 {
+		return Bound{0, 0}
+	}
+
+	min := values[0]
+	max := values[0]
+	for _, val := range values[1:] {
 		if val < min {
 			min = val
 		}
@@ -71,28 +81,28 @@ func getBounds(values []float64) (min float64, max float64) {
 			max = val
 		}
 	}
-	return
+	return Bound{min, max}
 }
 
-func groupValuesToBins(values []float64, nBin int, left float64, right float64) []LabeledValue {
-	binSize := (right - left) / float64(nBin)
+func groupValuesToBins(values []float64, nBin int, bound Bound) []LabeledValue {
+	binSize := (bound.right - bound.left) / float64(nBin)
 	bins := make([]LabeledValue, nBin)
 
 	// label the bin by the upper/right bound
 	for bin := 0; bin < nBin; bin++ {
-		left_bound := left + float64(bin)*binSize
-		right_bound := left_bound + binSize
+		right_bound := bound.left + float64(bin+1)*binSize
 		bins[bin].label = fmt.Sprintf("%.2f", right_bound)
 	}
+	bins[0].label = fmt.Sprintf("%.2f -> %s", bound.left, bins[0].label)
 
 	for _, val := range values {
 		switch {
-		case val < left, val > right:
+		case val < bound.left, val > bound.right:
 			continue
-		case val == right:
+		case val == bound.right:
 			bins[nBin-1].value++
 		default:
-			bins[int((val-left)/binSize)].value++
+			bins[int((val-bound.left)/binSize)].value++
 		}
 	}
 	return bins
