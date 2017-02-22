@@ -1,21 +1,19 @@
 package plot
 
 import (
-	"bufio"
 	"fmt"
 	"math"
 	"os"
-	"strconv"
 )
 
 type Bound struct {
-	left  float64
-	right float64
+	Left  float64
+	Right float64
 }
 
 type Bin struct {
-	bound Bound
-	count int
+	Bound
+	Count int
 }
 
 // extend histogram flags from bar's flags
@@ -46,28 +44,16 @@ func Histogram(args []string) error {
 	if math.IsNaN(leftBound) || math.IsNaN(rightBound) {
 		bound := getBounds(values)
 		if math.IsNaN(leftBound) {
-			leftBound = bound.left
+			leftBound = bound.Left
 		}
 		if math.IsNaN(rightBound) {
-			rightBound = bound.right
+			rightBound = bound.Right
 		}
 	}
 
 	bins := groupValuesToBins(values, nBin, Bound{leftBound, rightBound})
 	drawBins(bins)
 	return nil
-}
-
-func readValues(scanner *bufio.Scanner) ([]float64, error) {
-	var values []float64
-	for scanner.Scan() {
-		value, err := strconv.ParseFloat(scanner.Text(), 64)
-		if err != nil {
-			return values, fmt.Errorf("input value is not a number: %v", err)
-		}
-		values = append(values, value)
-	}
-	return values, nil
 }
 
 func getBounds(values []float64) Bound {
@@ -90,24 +76,24 @@ func getBounds(values []float64) Bound {
 }
 
 func groupValuesToBins(values []float64, nBin int, bound Bound) []Bin {
-	binSize := (bound.right - bound.left) / float64(nBin)
+	binSize := (bound.Right - bound.Left) / float64(nBin)
 	bins := make([]Bin, nBin)
 
 	// label the bin by the upper/right bound
 	for bin := 0; bin < nBin; bin++ {
-		leftBound := bound.left + float64(bin)*binSize
+		leftBound := bound.Left + float64(bin)*binSize
 		rightBound := leftBound + binSize
-		bins[bin].bound = Bound{leftBound, rightBound}
+		bins[bin].Bound = Bound{leftBound, rightBound}
 	}
 
 	for _, val := range values {
 		switch {
-		case val < bound.left, val > bound.right:
+		case val < bound.Left, val > bound.Right:
 			continue
-		case val == bound.right:
-			bins[nBin-1].count++
+		case val == bound.Right:
+			bins[nBin-1].Count++
 		default:
-			bins[int((val-bound.left)/binSize)].count++
+			bins[int((val-bound.Left)/binSize)].Count++
 		}
 	}
 	return bins
@@ -116,10 +102,11 @@ func groupValuesToBins(values []float64, nBin int, bound Bound) []Bin {
 func drawBins(bins []Bin) {
 	bars := make([]LabeledValue, len(bins))
 	for i, bin := range bins {
-		bars[i].label = fmt.Sprintf("%.2f", bin.bound.right)
+		bars[i].Label = fmt.Sprintf("%.2f", bin.Right)
+		bars[i].Value = float64(bin.Count)
 	}
 	if len(bins) > 1 {
-		bars[0].label = fmt.Sprintf("%.2f -> %.2f", bins[0].bound.left, bins[0].bound.right)
+		bars[0].Label = fmt.Sprintf("%.2f -> %.2f", bins[0].Left, bins[0].Right)
 	}
 	drawBars(bars)
 }

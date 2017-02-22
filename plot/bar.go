@@ -1,21 +1,14 @@
 package plot
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
-	"math"
 	"strconv"
 	"strings"
 )
 
 const block = "▇"
 const tinyBlock = "▏"
-
-type LabeledValue struct {
-	label string
-	value float64
-}
 
 var barFlags = flag.NewFlagSet("bar", flag.ExitOnError)
 var separator = barFlags.String("sep", " ", "string used to separate values")
@@ -33,46 +26,27 @@ func Bar(args []string) error {
 	return nil
 }
 
-func readLabeledValues(scanner *bufio.Scanner) ([]LabeledValue, error) {
-	var values []LabeledValue
-	for scanner.Scan() {
-		text := scanner.Text()
-		parts := strings.Split(text, *separator)
-		if len(parts) != 2 {
-			return values, fmt.Errorf("bar plot: input is not in \"label%svalue\" format: %s", *separator, text)
-		}
-
-		label := parts[0]
-		value, err := strconv.ParseFloat(parts[1], 64)
-		if err != nil {
-			return values, fmt.Errorf("bar plot: input value is not a number: %v", err)
-		}
-
-		if value < 0 {
-			return values, fmt.Errorf("bar plot: plot with negative number is not supported yet: %v", value)
-		}
-		values = append(values, LabeledValue{label, value})
-	}
-	return values, nil
-}
-
 func drawBars(values []LabeledValue) {
+	if len(values) == 0 {
+		return
+	}
+
 	// iterate over the values once to get maximum values and label width
-	max := -math.MaxFloat64
-	maxLabelWidth := 0
-	for _, val := range values {
-		if val.value > max {
-			max = val.value
+	max := values[0].Value
+	maxLabelWidth := len(values[0].Label)
+	for _, val := range values[1:] {
+		if val.Value > max {
+			max = val.Value
 		}
-		if len(val.label) > maxLabelWidth {
-			maxLabelWidth = len(val.label)
+		if len(val.Label) > maxLabelWidth {
+			maxLabelWidth = len(val.Label)
 		}
 	}
 
 	// normalize float64 values into int [0, maxWidth] range
 	normalized := make([]int, len(values))
-	for index, bar := range values {
-		normalized[index] = int(bar.value / max * float64(*maxWidth))
+	for index, val := range values {
+		normalized[index] = int(val.Value / max * float64(*maxWidth))
 	}
 
 	labelWidth := strconv.Itoa(maxLabelWidth)
@@ -82,6 +56,6 @@ func drawBars(values []LabeledValue) {
 			// use a small line for bar with 0 width
 			rect = tinyBlock
 		}
-		fmt.Printf("%"+labelWidth+"s: %s  %g\n", bar.label, rect, bar.value)
+		fmt.Printf("%"+labelWidth+"s: %s  %g\n", bar.Label, rect, bar.Value)
 	}
 }
